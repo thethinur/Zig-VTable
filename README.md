@@ -50,8 +50,8 @@ const VTable = CreateVTable(TagType, Table);
 Any name for each is legal, just only have one field with TagType.
 ```Zig
 const ImplementingStruct = struct {
-    vtableTag: VTable.TagType, //or use theTagType this is just so you don't have to write it twice if you rename you TagType.
-    unrelatedField: i32,
+    vtableTag: VTable.TagType, // this is just so you don't have to write your TagType twice if you rename you choose to rename it.
+    unrelatedField: i32, // Just for show :)
     ...
     const func1 = VTable.Fn("func1");
     const func2 = VTable.Fn("func2");
@@ -73,6 +73,27 @@ fn main() void {
 }
 ```
 
+## The Future
+Eventually I'll make it so you can also do. 
+```Zig
+const ImplementingUnion = union(VTable.TagType) {
+    A: A,
+    B: B,
+    C: C
+    ...
+    const func1 = VTable.Fn("func1");
+    const func2 = VTable.Fn("func2");
+    ...
+};
 
+const ImplementingStruct = struct {
+    vtableTag: union(VTable.TagType) { A: A, B: B, C: C, ... }, 
+    unrelatedField: i32, // Just for show :)
+    ...
+    const func1 = VTable.Fn("func1");
+    const func2 = VTable.Fn("func2");
+    ...
+};
+```
 
 
