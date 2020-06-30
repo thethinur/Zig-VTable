@@ -21,14 +21,14 @@ const Animal = struct {
     const talk = VTable.Fn("talk");
     const weightG = VTable.Fn("weightG");
 
-    const VTable = CreateVTable(Tag, Functions);
+    const VTable = CreateVTable(Tag, Table);
     
     const Tag = enum {
         Dog,
         Cat,
         Frog
     };
-    const Functions = struct {
+    const Table = struct {
         const Dog = struct {
             fn talk(self: *Animal) []const u8 {
                 return "Woof";
