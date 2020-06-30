@@ -3,12 +3,20 @@ const std = @import("std");
 pub fn main() !void {
     const stdOut = std.io.getStdOut().outStream();
 
-    var animal: Animal = .{ .class = .Dog }; 
-    try stdOut.print("{}", .{ animal.talk(.{}) });
+    var animal: Animal = .{ .class = .Dog, .weight = 10_000 }; 
+    try stdOut.print("{} {}grams\n", .{ animal.talk(.{}), animal.weightG(.{}) });
+    animal.weight = 12_000;
+    try stdOut.print("{} {}grams\n", .{ animal.talk(.{}), animal.weightG(.{}) });
+
+    animal = .{ .class = .Cat, .weight = 3_000 };
+    try stdOut.print("{} {}grams\n", .{ animal.talk(.{}), animal.weightG(.{}) });
+    animal = .{ .class = .Frog, .weight = 250 };
+    try stdOut.print("{} {}grams\n", .{ animal.talk(.{}), animal.weightG(.{}) });
 }
 
 const Animal = struct {
     class: ClassesEnum,
+    weight: i32,
 
     const talk = ClassVTable.Fn("talk");
     const weightG = ClassVTable.Fn("weightG");
@@ -26,7 +34,7 @@ const Animal = struct {
                 return "Woof";
             }
             fn weightG(self: *Animal) i32 {
-                return 30000;
+                return self.weight;
             }
         },
         .Cat = struct {
@@ -34,7 +42,7 @@ const Animal = struct {
                 return "Meow";
             }
             fn weightG(self: *Animal) i32 {
-                return 12000;
+                return self.weight;
             }
         },
         .Frog = struct {
@@ -42,7 +50,7 @@ const Animal = struct {
                 return "Ribbit";
             }
             fn weightG(self: *Animal) i32 {
-                return 250;
+                return self.weight;
             }
         }
     };
