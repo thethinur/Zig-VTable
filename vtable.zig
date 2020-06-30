@@ -28,75 +28,81 @@ const Animal = struct {
         Cat,
         Frog
     };
-    const Functions = .{
-        .Dog = struct {
+    const Functions = struct {
+        const Dog = struct {
             fn talk(self: *Animal) []const u8 {
                 return "Woof";
             }
             fn weightG(self: *Animal) i32 {
                 return self.weight;
             }
-        },
-        .Cat = struct {
+        };
+        const Cat = struct {
             fn talk(self: *Animal) []const u8 {
                 return "Meow";
             }
             fn weightG(self: *Animal) i32 {
                 return self.weight;
             }
-        },
-        .Frog = struct {
+        };
+        const Frog = struct {
             fn talk(self: *Animal) []const u8 {
                 return "Ribbit";
             }
             fn weightG(self: *Animal) i32 {
                 return self.weight;
             }
-        }
+        };
     };
 };
 
 
 
-fn CreateVTable (comptime TagType: type, comptime Map: var) type {
+fn CreateVTable (comptime TagType: type, comptime Table: type) type {
     const enumInfo = @typeInfo(TagType);
-    const classesInfo = @typeInfo(@TypeOf(Map));
+    const tableInfo = @typeInfo(Table);
     
     if (enumInfo != .Enum)  @compileError("Enum is not an enum type");
-    switch (classesInfo) 
+    switch (tableInfo) 
     {
         .Struct => |data| {
-            if (data.fields.len != enumInfo.Enum.fields.len) @compileError("ClassEnum and Structs are not even");
-            for (data.fields) |field| 
-                if (!@hasField(TagType, field.name)) 
+            if (data.decls.len != enumInfo.Enum.fields.len) @compileError("ClassEnum and Structs are not even");
+            for (data.decls) |decl| 
+                if (!@hasField(TagType, decl.name)) 
                     @compileError("ClassEnum and Structs are not even");
         },
         else => @compileError("Not a struct")
     }
+
+    const tabledecls = tableInfo.Struct.decls;
     
     return struct {
         pub const Tag = TagType;
         fn ReturnType(comptime funcName: []const u8) type {
-            return @typeInfo(@TypeOf(@field(@field(Map, classesInfo.Struct.fields[0].name), funcName))).Fn.return_type.?;
+            return @typeInfo(@TypeOf(@field(@field(Table, tabledecls[0].name), funcName))).Fn.return_type.?;
         }
         fn FunctionType(comptime funcName: []const u8) type {
-            return @TypeOf(@field(@field(Map, classesInfo.Struct.fields[0].name), funcName));
+            return @TypeOf(@field(@field(Table, tabledecls[0].name), funcName));
         }
         pub fn Fn(comptime funcName: []const u8) (fn(var, var) ReturnType(funcName)) {
             
             const fnArray = br: {
-                var _fnArray: [classesInfo.Struct.fields.len] FunctionType(funcName) = undefined;
-                for (classesInfo.Struct.fields) |field|
-                    _fnArray[@enumToInt(@field(TagType, field.name))] = @field(@field(Map, field.name),funcName);
+                var _fnArray: [tabledecls.len] FunctionType(funcName) = undefined;
+                for (tabledecls) |decl|
+                    _fnArray[@enumToInt(@field(TagType, decl.name))] = @field(@field(Table, decl.name),funcName);
                 break :br &_fnArray;
             };
 
             return struct {
                 fn _func(self: var, args: var) ReturnType(funcName) {
+                    const tagName = comptime for(@typeInfo(@TypeOf(self.*)).Struct.fields) |field| {
+                        if (field.field_type == TagType) break field.name;
+                    } else @compileError("self is somehow not a struct");
 
-                    return @call(.{}, fnArray[@enumToInt(self.class)], .{ self } ++ args );
+                    return @call(.{}, fnArray[@enumToInt(@field(self, tagName))], .{ self } ++ args );
                 }
             }._func;
         }
     };
+}
 }
