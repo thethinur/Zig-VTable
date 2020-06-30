@@ -47,4 +47,3 @@ fn CreateVTable (comptime TagType: type, comptime Table: type) type {
         }
     };
 }
-}
