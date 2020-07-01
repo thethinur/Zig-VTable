@@ -49,7 +49,7 @@ const VTable = CreateVTable(TagType, Table);
 ## Give one of the fields the TagType and get the wrapper functions:
 Any name for each is legal, just only have one field with TagType.
 ```Zig
-const ImplementingStruct = struct {
+pub const ImplementingStruct = struct {
     vtableTag: VTable.TagType, // this is just so you don't have to write your TagType twice if you rename you choose to rename it.
     unrelatedField: i32, // Just for show :)
     ...
@@ -62,7 +62,7 @@ const ImplementingStruct = struct {
 ## Finally how to call them:
 To be able to call any of the functions you'll need a wrapper function. This implementation utilizes a generic wrapper for all functions. Hopefully it get's inlined.
 ```Zig
-fn main() void {
+pub fn main() void {
     var runtimePolymorphism: ImplementingStruct = .{ .vtableTag = .A, ... }; 
     
     runtimePolymorphism.func1(.{ ... }); // Should execute Table.A.func1()!
@@ -76,7 +76,7 @@ fn main() void {
 ## The Future
 Eventually I'll make it so you can also do. 
 ```Zig
-const ImplementingUnion = union(VTable.TagType) {
+pub const ImplementingUnion = union(VTable.TagType) {
     A: A,
     B: B,
     C: C
@@ -86,7 +86,7 @@ const ImplementingUnion = union(VTable.TagType) {
     ...
 };
 
-const ImplementingStruct = struct {
+pub const ImplementingStruct = struct {
     vtableTag: union(VTable.TagType) { A: A, B: B, C: C, ... }, 
     unrelatedField: i32, // Just for show :)
     ...
