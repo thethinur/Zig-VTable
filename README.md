@@ -6,7 +6,7 @@ It works similar to a tagged union.
 
 Here's how it works:
 
-## First create a the Type for you Tag:
+## First create the enum for you Tag:
 ```Zig
 const TagType = enum {
     A,
