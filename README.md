@@ -2,7 +2,7 @@
 
 This solution is implemented by heavy use of the Zig's comptime and metaprogramming, due to the current state of Zig I can't garentee it won't be changed or break. 
 
-It's designed to be fast, seemless and ready to use, no writing your own wrapper functions or anything, though I might let do so in the in the future.
+It's designed to be fast, seemless and ready to use, no writing your own wrapper functions or anything, though I might let you do so in the in the future.
 
 # How to use it
 
