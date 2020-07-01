@@ -1,7 +1,7 @@
 const std = @import("std");
 
-fn CreateVTable (comptime TagType: type, comptime Table: type) type {
-    const enumInfo = @typeInfo(TagType);
+pub fn CreateVTable (comptime TagT: type, comptime Table: type) type {
+    const enumInfo = @typeInfo(TagT);
     const tableInfo = @typeInfo(Table);
     
     if (enumInfo != .Enum)  @compileError("Enum is not an enum type");
@@ -10,7 +10,7 @@ fn CreateVTable (comptime TagType: type, comptime Table: type) type {
         .Struct => |data| {
             if (data.decls.len != enumInfo.Enum.fields.len) @compileError("ClassEnum and Structs are not even");
             for (data.decls) |decl| 
-                if (!@hasField(TagType, decl.name)) 
+                if (!@hasField(TagT, decl.name)) 
                     @compileError("ClassEnum and Structs are not even");
         },
         else => @compileError("Not a struct")
@@ -19,7 +19,7 @@ fn CreateVTable (comptime TagType: type, comptime Table: type) type {
     const tabledecls = tableInfo.Struct.decls;
     
     return struct {
-        pub const Tag = TagType;
+        pub const TagType = TagT;
         fn ReturnType(comptime funcName: []const u8) type {
             return @typeInfo(@TypeOf(@field(@field(Table, tabledecls[0].name), funcName))).Fn.return_type.?;
         }
@@ -31,14 +31,14 @@ fn CreateVTable (comptime TagType: type, comptime Table: type) type {
             const fnArray = br: {
                 var _fnArray: [tabledecls.len] FunctionType(funcName) = undefined;
                 for (tabledecls) |decl|
-                    _fnArray[@enumToInt(@field(TagType, decl.name))] = @field(@field(Table, decl.name),funcName);
+                    _fnArray[@enumToInt(@field(TagT, decl.name))] = @field(@field(Table, decl.name),funcName);
                 break :br &_fnArray;
             };
 
             return struct {
                 fn _func(self: var, args: var) ReturnType(funcName) {
                     const tagName = comptime for(@typeInfo(@TypeOf(self.*)).Struct.fields) |field| {
-                        if (field.field_type == TagType) break field.name;
+                        if (field.field_type == TagT) break field.name;
                     } else @compileError("self is somehow not a struct");
 
                     return @call(.{}, fnArray[@enumToInt(@field(self, tagName))], .{ self } ++ args );

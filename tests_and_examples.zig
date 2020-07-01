@@ -1,5 +1,7 @@
-const assert = @import("std").debug.assert;
+const std = @import("std");
+const assert = std.debug.assert;
 const vtable = @import("vtable.zig");
+const CreateVTable = vtable.CreateVTable;
 
 const Animal = struct {
     class: VTable.TagType,
@@ -16,27 +18,27 @@ const Animal = struct {
         Frog
     };
     const Table = struct {
-        const Dog = struct {
-            fn talk(self: *Animal) []const u8 {
+        pub const Dog = struct {
+            pub fn talk(self: *Animal) []const u8 {
                 return "Woof";
             }
-            fn weightG(self: *Animal) i32 {
+            pub fn weightG(self: *Animal) i32 {
                 return self.weight;
             }
         };
-        const Cat = struct {
-            fn talk(self: *Animal) []const u8 {
+        pub const Cat = struct {
+            pub fn talk(self: *Animal) []const u8 {
                 return "Meow";
             }
-            fn weightG(self: *Animal) i32 {
+            pub fn weightG(self: *Animal) i32 {
                 return self.weight;
             }
         };
-        const Frog = struct {
-            fn talk(self: *Animal) []const u8 {
+        pub const Frog = struct {
+            pub fn talk(self: *Animal) []const u8 {
                 return "Ribbit";
             }
-            fn weightG(self: *Animal) i32 {
+            pub fn weightG(self: *Animal) i32 {
                 return self.weight;
             }
         };
@@ -44,8 +46,6 @@ const Animal = struct {
 };
 
 test "struct implementation" {
-
-    const stdOut = std.io.getStdOut().outStream();
 
     var animal: Animal = .{ .class = .Dog, .weight = 10_000 }; 
 

@@ -21,19 +21,19 @@ Notice the names are the same as the TagType. Similar to a union with a TagType.
 ```Zig
 
 const Table = struct {
-    const A = struct {
-        fn func1(self: *ImplementingStruct, ...) { ... }
-        fn func2(self: *ImplementingStruct, ...) { ... }
+    pub const A = struct {
+        pub fn func1(self: *ImplementingStruct, ...) { ... }
+        pub fn func2(self: *ImplementingStruct, ...) { ... }
         ...
     };
-    const B = struct {
-        fn func1(self: *ImplementingStruct, ...) { ... }
-        fn func2(self: *ImplementingStruct, ...) { ... }
+    pub const B = struct {
+        pub fn func1(self: *ImplementingStruct, ...) { ... }
+        pub fn func2(self: *ImplementingStruct, ...) { ... }
         ...
     };
-    const C = struct {
-        fn func1(self: *ImplementingStruct, ...) { ... }
-        fn func2(self: *ImplementingStruct, ...) { ... }
+    pub const C = struct {
+        pub fn func1(self: *ImplementingStruct, ...) { ... }
+        pub fn func2(self: *ImplementingStruct, ...) { ... }
         ...
     };
     ...
@@ -53,8 +53,8 @@ const ImplementingStruct = struct {
     vtableTag: VTable.TagType, // this is just so you don't have to write your TagType twice if you rename you choose to rename it.
     unrelatedField: i32, // Just for show :)
     ...
-    const func1 = VTable.Fn("func1");
-    const func2 = VTable.Fn("func2");
+    pub const func1 = VTable.Fn("func1");
+    pub const func2 = VTable.Fn("func2");
     ...
 };
 ```
@@ -81,8 +81,8 @@ const ImplementingUnion = union(VTable.TagType) {
     B: B,
     C: C
     ...
-    const func1 = VTable.Fn("func1");
-    const func2 = VTable.Fn("func2");
+    pub const func1 = VTable.Fn("func1");
+    pub const func2 = VTable.Fn("func2");
     ...
 };
 
@@ -90,8 +90,8 @@ const ImplementingStruct = struct {
     vtableTag: union(VTable.TagType) { A: A, B: B, C: C, ... }, 
     unrelatedField: i32, // Just for show :)
     ...
-    const func1 = VTable.Fn("func1");
-    const func2 = VTable.Fn("func2");
+    pub const func1 = VTable.Fn("func1");
+    pub const func2 = VTable.Fn("func2");
     ...
 };
 ```
