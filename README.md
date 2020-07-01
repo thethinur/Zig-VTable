@@ -43,7 +43,7 @@ const Table = struct {
 ## Create the Table:
 The Simple part
 ```Zig
-const VTable = CreateVTable(TagType, Table);
+const VTable = CreateVTable(TagType, Table, .Struct);
 ```
 
 ## Give one of the fields the TagType and get the wrapper functions:
@@ -51,6 +51,35 @@ Any name for each is legal, just only have one field with TagType.
 ```Zig
 pub const ImplementingStruct = struct {
     vtableTag: VTable.TagType, // this is just so you don't have to write your TagType twice if you rename you choose to rename it.
+    unrelatedField: i32, // Just for show :)
+    ...
+    pub const func1 = VTable.Fn("func1");
+    pub const func2 = VTable.Fn("func2");
+    ...
+};
+```
+## Alternatives
+Eventually I'll make it so you can also do. 
+### In an union:
+```Zig
+const VTable = CreateVTable(TagType, Table, .Union);
+
+pub const ImplementingUnion = union(VTable.TagType) {
+    A: A,
+    B: B,
+    C: C
+    ...
+    pub const func1 = VTable.Fn("func1");
+    pub const func2 = VTable.Fn("func2");
+    ...
+};
+```
+### Or with union as the tag:
+```Zig
+const VTable = CreateVTable(TagType, Table, .Struct);
+
+pub const ImplementingStruct = struct {
+    vtableTag: union(VTable.TagType) { A: A, B: B, C: C, ... }, 
     unrelatedField: i32, // Just for show :)
     ...
     pub const func1 = VTable.Fn("func1");
@@ -73,27 +102,6 @@ pub fn main() void {
 }
 ```
 
-## The Future
-Eventually I'll make it so you can also do. 
-```Zig
-pub const ImplementingUnion = union(VTable.TagType) {
-    A: A,
-    B: B,
-    C: C
-    ...
-    pub const func1 = VTable.Fn("func1");
-    pub const func2 = VTable.Fn("func2");
-    ...
-};
 
-pub const ImplementingStruct = struct {
-    vtableTag: union(VTable.TagType) { A: A, B: B, C: C, ... }, 
-    unrelatedField: i32, // Just for show :)
-    ...
-    pub const func1 = VTable.Fn("func1");
-    pub const func2 = VTable.Fn("func2");
-    ...
-};
-```
 
 
