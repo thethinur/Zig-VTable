@@ -8,7 +8,7 @@ Here's how it works:
 
 ## First create a the Type for you Tag:
 ```Zig
-const TagType = struct {
+const TagType = enum {
     A,
     B,
     C,
