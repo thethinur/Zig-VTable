@@ -1,10 +1,10 @@
-# Zig-VTable
+# About Zig-VTable
 
-This is an example of how you could implement a Tagged VTable
+This solution is implemented by heavy use of the Zig's comptime and metaprogramming, due to the current state of Zig I can't garentee it won't be changed or break. 
 
-It works similar to a tagged union.
+It's designed to be fast, seemless and ready to use, no writing your own wrapper functions or anything, though I might let do so in the in the future.
 
-Here's how it works:
+# How to use it
 
 ## First create the enum for you Tag:
 ```Zig
