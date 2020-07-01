@@ -3,14 +3,13 @@ const assert = std.debug.assert;
 const vtable = @import("vtable.zig");
 const CreateVTable = vtable.CreateVTable;
 
-const Animal = struct {
+const AnimalStruct = struct {
     class: VTable.TagType,
-    weight: i32,
 
     const talk = VTable.Fn("talk");
-    const weightG = VTable.Fn("weightG");
+    const quickMath = VTable.Fn("quickMath");
 
-    const VTable = CreateVTable(Tag, Table);
+    const VTable = CreateVTable(Tag, Table, .Struct);
 
     const Tag = enum {
         Dog,
@@ -19,50 +18,172 @@ const Animal = struct {
     };
     const Table = struct {
         pub const Dog = struct {
-            pub fn talk(self: *Animal) []const u8 {
+            pub fn talk(self: *AnimalStruct) []const u8 {
                 return "Woof";
             }
-            pub fn weightG(self: *Animal) i32 {
-                return self.weight;
+            pub fn quickMath(self: *AnimalStruct, a: i32, b: i32) i32 {
+                return a + b;
             }
         };
         pub const Cat = struct {
-            pub fn talk(self: *Animal) []const u8 {
+            pub fn talk(self: *AnimalStruct) []const u8 {
                 return "Meow";
             }
-            pub fn weightG(self: *Animal) i32 {
-                return self.weight;
+            pub fn quickMath(self: *AnimalStruct, a: i32, b: i32) i32 {
+                return a * b;
             }
         };
         pub const Frog = struct {
-            pub fn talk(self: *Animal) []const u8 {
+            pub fn talk(self: *AnimalStruct) []const u8 {
                 return "Ribbit";
             }
-            pub fn weightG(self: *Animal) i32 {
-                return self.weight;
+            pub fn quickMath(self: *AnimalStruct, a: i32, b: i32) i32 {
+                return std.math.sqrt(a * a + b * b);
             }
         };
     };
 };
 
-test "struct implementation" {
 
-    var animal: Animal = .{ .class = .Dog, .weight = 10_000 }; 
+
+
+
+test "struct with tag implementation" {
+
+    var animal: AnimalStruct = .{ .class = .Dog, }; 
 
     assert( std.mem.eql(u8, "Woof", animal.talk(.{})));
-    assert( animal.weightG(.{}) == 10_000);
+    assert( animal.quickMath(.{3, 4}) == 7);
 
-    animal.weight = 12_000;
-
-    assert( animal.weightG(.{}) == 12_000);
-
-    animal = .{ .class = .Cat, .weight = 3_000 };
+    animal = .{ .class = .Cat, };
 
     assert( std.mem.eql(u8, "Meow", animal.talk(.{})));
-    assert( animal.weightG(.{}) == 3_000);
+    assert( animal.quickMath(.{3, 4}) == 12);
 
-    animal = .{ .class = .Frog, .weight = 250 };
+    animal = .{ .class = .Frog, };
 
     assert( std.mem.eql(u8, "Ribbit", animal.talk(.{})));
-    assert( animal.weightG(.{}) == 250);
+    assert( animal.quickMath(.{3, 4}) == 5);
+}
+
+const AnimalStructWithUnion = struct {
+    class: union(VTable.TagType) {
+        Dog: i32,
+        Cat: i32,
+        Frog: i32,
+    },
+
+    const talk = VTable.Fn("talk");
+    const quickMath = VTable.Fn("quickMath");
+
+    const VTable = CreateVTable(Tag, Table, .Struct);
+
+    const Tag = enum {
+        Dog,
+        Cat,
+        Frog
+    };
+    const Table = struct {
+        pub const Dog = struct {
+            pub fn talk(self: *AnimalStructWithUnion) []const u8 {
+                return "Woof";
+            }
+            pub fn quickMath(self: *AnimalStructWithUnion, a: i32, b: i32) i32 {
+                return a + b;
+            }
+        };
+        pub const Cat = struct {
+            pub fn talk(self: *AnimalStructWithUnion) []const u8 {
+                return "Meow";
+            }
+            pub fn quickMath(self: *AnimalStructWithUnion, a: i32, b: i32) i32 {
+                return a * b;
+            }
+        };
+        pub const Frog = struct {
+            pub fn talk(self: *AnimalStructWithUnion) []const u8 {
+                return "Ribbit";
+            }
+            pub fn quickMath(self: *AnimalStructWithUnion, a: i32, b: i32) i32 {
+                return std.math.sqrt(a * a + b * b);
+            }
+        };
+    };
+};
+
+test "struct with union implementation" { 
+    var animal: AnimalStructWithUnion = .{ .class = .{ .Dog = 0} }; 
+
+    assert( std.mem.eql(u8, "Woof", animal.talk(.{})));
+    assert( animal.quickMath(.{3, 4}) == 7);
+
+    animal = .{ .class = .{ .Cat = 0 }};
+
+    assert( std.mem.eql(u8, "Meow", animal.talk(.{})));
+    assert( animal.quickMath(.{3, 4}) == 12);
+
+    animal = .{ .class = .{ .Frog = 0 }};
+
+    assert( std.mem.eql(u8, "Ribbit", animal.talk(.{})));
+    assert( animal.quickMath(.{3, 4}) == 5);
+}
+
+const AnimalUnion = union(VTable.TagType) {
+    Dog: i32,
+    Cat: i32,
+    Frog: i32,
+
+    const talk = VTable.Fn("talk");
+    const quickMath = VTable.Fn("quickMath");
+
+    const VTable = CreateVTable(Tag, Table, .Union);
+
+    const Tag = enum {
+        Dog,
+        Cat,
+        Frog
+    };
+    const Table = struct {
+        pub const Dog = struct {
+            pub fn talk(self: *AnimalUnion) []const u8 {
+                return "Woof";
+            }
+            pub fn quickMath(self: *AnimalUnion, a: i32, b: i32) i32 {
+                return a + b;
+            }
+        };
+        pub const Cat = struct {
+            pub fn talk(self: *AnimalUnion) []const u8 {
+                return "Meow";
+            }
+            pub fn quickMath(self: *AnimalUnion, a: i32, b: i32) i32 {
+                return a * b;
+            }
+        };
+        pub const Frog = struct {
+            pub fn talk(self: *AnimalUnion) []const u8 {
+                return "Ribbit";
+            }
+            pub fn quickMath(self: *AnimalUnion, a: i32, b: i32) i32 {
+                return std.math.sqrt(a * a + b * b);
+            }
+        };
+    };
+};
+
+test "union implementation" { 
+    var animal: AnimalUnion = .{ .Dog = 0 }; 
+
+    assert( std.mem.eql(u8, "Woof", animal.talk(.{})));
+    assert( animal.quickMath(.{3, 4}) == 7);
+
+    animal = .{ .Cat = 0 };
+
+    assert( std.mem.eql(u8, "Meow", animal.talk(.{})));
+    assert( animal.quickMath(.{3, 4}) == 12);
+
+    animal = .{ .Frog = 0 };
+
+    assert( std.mem.eql(u8, "Ribbit", animal.talk(.{})));
+    assert( animal.quickMath(.{3, 4}) == 5);
 }

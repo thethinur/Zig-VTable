@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub fn CreateVTable (comptime TagT: type, comptime Table: type) type {
+pub fn CreateVTable (comptime TagT: type, comptime Table: type, comptime implementingType: enum { Struct, Union }) type {
     const enumInfo = @typeInfo(TagT);
     const tableInfo = @typeInfo(Table);
     
@@ -35,15 +35,29 @@ pub fn CreateVTable (comptime TagT: type, comptime Table: type) type {
                 break :br &_fnArray;
             };
 
-            return struct {
-                fn _func(self: var, args: var) ReturnType(funcName) {
-                    const tagName = comptime for(@typeInfo(@TypeOf(self.*)).Struct.fields) |field| {
-                        if (field.field_type == TagT) break field.name;
-                    } else @compileError("self is somehow not a struct");
+            if (implementingType == .Union)
+                return struct {
+                    fn _func(self: var, args: var) ReturnType(funcName) {
+                    
+                        return @call(.{}, fnArray[@enumToInt(self.*)], .{ self } ++ args );
+                    }
+                }._func
+            else
+                return struct {
+                    fn _func(self: var, args: var) ReturnType(funcName) {
+                        const tagName = 
+                            comptime for(@typeInfo(@TypeOf(self.*)).Struct.fields) |field| {
+                                if (field.field_type == TagT) break field.name
+                                else switch (@typeInfo(field.field_type)) {
+                                    .Union => |unionInfo| { if (unionInfo.tag_type == TagT) break field.name;  }, 
+                                    else => continue
+                                }
+                            };
+                        
 
-                    return @call(.{}, fnArray[@enumToInt(@field(self, tagName))], .{ self } ++ args );
-                }
-            }._func;
+                        return @call(.{}, fnArray[@enumToInt(@field(self, tagName))], .{ self } ++ args );
+                    }
+                }._func;
         }
     };
 }
