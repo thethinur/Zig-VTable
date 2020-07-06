@@ -35,15 +35,14 @@ pub fn CreateVTable (comptime TagT: type, comptime Table: type, comptime impleme
                 break :br &_fnArray;
             };
 
-            if (implementingType == .Union)
-                return struct {
+            return switch (implementingType) {
+                .Union => struct {
                     fn _func(self: var, args: var) ReturnType(funcName) {
                     
                         return @call(.{}, fnArray[@enumToInt(self.*)], .{ self } ++ args );
                     }
-                }._func
-            else
-                return struct {
+                }._func,
+                .Struct => struct {
                     fn _func(self: var, args: var) ReturnType(funcName) {
                         const tagName = 
                             comptime for(@typeInfo(@TypeOf(self.*)).Struct.fields) |field| {
@@ -57,7 +56,8 @@ pub fn CreateVTable (comptime TagT: type, comptime Table: type, comptime impleme
 
                         return @call(.{}, fnArray[@enumToInt(@field(self, tagName))], .{ self } ++ args );
                     }
-                }._func;
+                }._func
+            };
         }
     };
 }
