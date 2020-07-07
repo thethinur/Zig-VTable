@@ -4,6 +4,8 @@ This solution is implemented by heavy use of the Zig's comptime and metaprogramm
 
 It's designed to be fast, seemless and ready to use, no writing your own wrapper functions or anything, though I might let you do so in the in the future.
 
+So if you just wanted a quick Tagged VTable to stitch to your struct or union, there hopefully shouldn't be too much fuzz in doing so. 
+
 # How to use it
 
 ## First create the enum for you Tag:
