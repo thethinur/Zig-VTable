@@ -1,4 +1,5 @@
 # About Zig-VTable
+This is a hobby VTable, I would recommend you to use [alexnask](https://github.com/alexnask)'s [interface.zig](https://github.com/alexnask/interface.zig) for more competent polymorphism.
 
 This solution is implemented by heavy use of the Zig's comptime and metaprogramming, due to the current state of Zig I can't garentee it won't be changed or break. 
 
